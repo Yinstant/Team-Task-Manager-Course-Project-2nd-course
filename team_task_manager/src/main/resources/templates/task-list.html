@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Task Manager</title>
+    </head>
+    <body>
+        <h1>Список задач</h1>
+        <a href="/tasks/add">Новая задача</a>
+        <div th:if="${message}" th:text="${message}" style="color:green"></div>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Дедлайн</th>
+                <th>Статус</th>
+                <th>Story Points</th>
+                <th>Приоритет</th>
+                <th>Время добавления</th>
+                <th>Время обновления</th>
+            </tr>
+            <tr th:each="task : ${tasks}">
+                <td th:text="${task.id}"></td>
+                <td th:text="${task.name}"></td>
+                <td th:text="${task.description}"></td>
+                <td th:text="${task.deadline}"></td>
+                <td th:text="${task.status}"></td>
+                <td th:text="${task.storyPoints}"></td>
+                <td th:text="${task.priority}"></td>
+                <td th:text="${task.creationTime}"></td>
+                <td th:text="${task.updatedTime}"></td>
+                <td>
+                    <a th:href="@{/tasks/edit/{id}(id=${task.id})}">Изменить</a>
+                    <a th:href="@{/tasks/delete/{id}(id=${task.id})}">Удалить</a>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

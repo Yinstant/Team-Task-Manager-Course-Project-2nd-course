@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Форма задачи</title>
+    </head>
+    <body>
+        <h1 th:text="${task.id} == null ? 'Добавление задачи' : 'Редактирование задачи'"></h1>
+        <form action="#" th:action="@{${task.id == null ? '/tasks' : '/tasks/update/' + task.id}}"
+            th:object="${task}" method="post">
+            <label>Название: <input type="text" th:field="*{name}"></label>
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                style="color:red"></span><br>
+            <label>Описание: <textarea th:field="*{description}"></textarea></label><br>
+            <label>Дедлайн: <input type="date" th:field="*{deadline}"></label><br>
+            <label>
+                Статус:
+                <select th:field="*{status}">
+                    <option th:value="'ToDo'">TO DO</option>
+                    <option th:value="'InProgress'">IN PROGRESS</option>
+                    <option th:value="'Review'">REVIEW</option>
+                    <option th:value="'Completed'">COMPLETED</option>
+                </select>
+            </label><br>
+            <label>Story Points: <input type="number" th:field="*{storyPoints}"></label><br>
+            <label>Приоритет: <input type="number" th:field="*{priority}"></label><br>
+
+            <button type="submit">Сохранить</button>
+        </form>
+        <a href="/tasks">Назад к списку</a>
+    </body>
+</html>
