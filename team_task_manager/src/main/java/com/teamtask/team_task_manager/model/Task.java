@@ -12,7 +12,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
@@ -56,4 +58,12 @@ public class Task {
 
     @UpdateTimestamp
     private LocalDateTime updatedTime;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "projectId")
+    private Project project;
+
+    @ManyToOne
+    @JoinColumn(name = "goalId")
+    private Goal goal;
 }
