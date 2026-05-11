@@ -8,9 +8,13 @@
                     th:text="${project.name}"></a>
                 <div class="flex-shrink-0">
                     <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                        th:href="@{/projects/{id}/delete(id=${project.id})}">Delete</a>
+                    th:href="@{/projects/{id}/delete(id=${project.id})}">Delete</a>
                     <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                        th:href="@{/projects/{id}/edit(id=${project.id})}">Edit</a>
+                    th:href="@{/projects/{id}/edit(id=${project.id})}">Edit</a>
+                    <a class="btn btn-sm float-end mx-1 ms-auto"
+                    th:href="@{/projects/{id}/invite(id=${project.id})}">
+                        <i class="bi-person-plus-fill"></i>
+                    </a>
                 </div>
             </li>
         </ul>

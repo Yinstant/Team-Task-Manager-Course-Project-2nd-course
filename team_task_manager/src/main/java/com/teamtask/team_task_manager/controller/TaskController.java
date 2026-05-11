@@ -2,6 +2,9 @@ package com.teamtask.team_task_manager.controller;
 
 import com.teamtask.team_task_manager.repository.GoalRepository;
 import com.teamtask.team_task_manager.repository.ProjectRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.teamtask.team_task_manager.model.Task;
 import com.teamtask.team_task_manager.repository.TaskRepository;
+import com.teamtask.team_task_manager.service.ProjectService;
 
 import jakarta.validation.Valid;
 
@@ -24,6 +28,8 @@ public class TaskController {
     private final GoalRepository goalRepository;
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
+
+    @Autowired ProjectService projectService;
 
     public TaskController(TaskRepository taskRepository, ProjectRepository projectRepository, GoalRepository goalRepository){
         this.taskRepository = taskRepository;
@@ -36,6 +42,10 @@ public class TaskController {
     public String ShowAddForm(@RequestParam Long projectId,
         @RequestParam(required = false) Long goalId,
         Model model){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
         Task task = new Task();
         task.setProject(projectRepository.getReferenceById(projectId));
         if (goalId != null){
@@ -56,6 +66,10 @@ public class TaskController {
             @RequestParam Long projectId,
             @RequestParam(required = false) Long goalId,
             RedirectAttributes redirectAttributes) {
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
         if (result.hasErrors())
             return "task-form";
 
@@ -75,6 +89,10 @@ public class TaskController {
     public String ShowEditForm(@PathVariable Long id, 
         @RequestParam Long projectId,
         Model model){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+        
         Task task = taskRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Invalid task id: " + id));
         
@@ -92,6 +110,10 @@ public class TaskController {
             @RequestParam Long projectId,
             @RequestParam(required = false) Long goalId,
             RedirectAttributes redirectAttributes) {
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
         if (result.hasErrors())
             return "task-form";
         
@@ -113,6 +135,10 @@ public class TaskController {
             @PathVariable Long id,
             @RequestParam Long projectId,
             RedirectAttributes redirectAttributes){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+        
         taskRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Задача успешно удалена!");
         return "redirect:/projects/" + projectId;

@@ -1,6 +1,10 @@
 package com.teamtask.team_task_manager.controller;
 
 import com.teamtask.team_task_manager.repository.ProjectRepository;
+import com.teamtask.team_task_manager.service.ProjectService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +27,8 @@ public class GoalController {
     private final ProjectRepository projectRepository;
     private final GoalRepository goalRepository;
 
+    @Autowired ProjectService projectService;
+
     public GoalController(GoalRepository goalRepository, ProjectRepository projectRepository){
         this.goalRepository = goalRepository;
         this.projectRepository = projectRepository;
@@ -32,6 +38,10 @@ public class GoalController {
     @GetMapping("/new")
     public String ShowAddForm(@RequestParam Long projectId,
         Model model){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
         Goal goal = new Goal();
         goal.setProject(projectRepository.getReferenceById(projectId));
     
@@ -46,6 +56,10 @@ public class GoalController {
             BindingResult result,
             @RequestParam Long projectId,
             RedirectAttributes redirectAttributes) {
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
         if (result.hasErrors())
             return "goal-form";
 
@@ -61,6 +75,10 @@ public class GoalController {
     public String ShowEditForm(@PathVariable Long id, 
         @RequestParam Long projectId,
         Model model){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+        
         Goal goal = goalRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Invalid goal id: " + id));
         
@@ -77,6 +95,10 @@ public class GoalController {
             BindingResult result,
             @RequestParam Long projectId,
             RedirectAttributes redirectAttributes) {
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
         if (result.hasErrors())
             return "goal-form";
         
@@ -95,6 +117,10 @@ public class GoalController {
             @PathVariable Long id,
             @RequestParam Long projectId,
             RedirectAttributes redirectAttributes){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+        
         goalRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Цель успешно удалена!");
         return "redirect:/projects/" + projectId;
