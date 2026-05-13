@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.teamtask.team_task_manager.model.Status;
 import com.teamtask.team_task_manager.model.Task;
 import com.teamtask.team_task_manager.repository.TaskRepository;
 import com.teamtask.team_task_manager.service.ProjectService;
+import com.teamtask.team_task_manager.service.TaskService;
 
 import jakarta.validation.Valid;
 
@@ -29,12 +31,19 @@ public class TaskController {
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
 
-    @Autowired ProjectService projectService;
+    private final ProjectService projectService;
+    private final TaskService taskService;
 
-    public TaskController(TaskRepository taskRepository, ProjectRepository projectRepository, GoalRepository goalRepository){
+    public TaskController(TaskRepository taskRepository, 
+        ProjectRepository projectRepository, 
+        GoalRepository goalRepository,
+        ProjectService projectService,
+        TaskService taskService){
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.goalRepository = goalRepository;
+        this.projectService = projectService;
+        this.taskService = taskService;
     }
 
     // Показать форму добавления задачи
@@ -142,5 +151,44 @@ public class TaskController {
         taskRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Задача успешно удалена!");
         return "redirect:/projects/" + projectId;
+    }
+
+    // Изменение статуса задачи
+    @PostMapping("/{id}/status")
+    public String ChangeStatus(@PathVariable Long id,
+        @RequestParam String oldStatus,
+        @RequestParam Long projectId,
+        RedirectAttributes redirectAttributes
+    ){
+        if (!projectService.HasAccess(projectId)){
+            throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+        
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid task id: " + id));
+
+        switch(oldStatus){
+            case "ToDo":
+                task.setStatus(Status.InProgress);
+                taskRepository.save(task);
+                break;
+            case "InProgress":
+                task.setStatus(Status.Review);
+                taskRepository.save(task);
+                break;
+            case "Review":
+                task.setStatus(Status.Checking);
+                taskRepository.save(task);
+                break;
+            case "Checking":
+                task.setStatus(Status.Completed);
+                taskRepository.save(task);
+                break;
+            case "Completed":
+                task.setStatus(Status.ToDo);
+                taskRepository.save(task);
+                break;
+        }
+        return "redirect:/projects/" + projectId + "/kanban";
     }
 }

@@ -47,11 +47,12 @@ public class Task {
     private Status status;
 
     @Min(1)
+    @Max(10)
     private Integer storyPoints;
 
-    @Min(1)
-    @Max(5)
-    private Integer priority;
+    @NotNull(message = "Приоритет задачи не может быть пустым!")
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
 
     @CreationTimestamp
     private LocalDateTime creationTime;

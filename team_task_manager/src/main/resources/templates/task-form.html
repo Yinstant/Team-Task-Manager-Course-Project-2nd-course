@@ -13,13 +13,17 @@
             th:object="${task}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="projectId" th:value="${projectId}" />
-                <label class="my-3">Название: <input type="text" th:field="*{name}"></label>
+
+                <label class="my-3">Название: <input type="text" th:field="*{name}"></label><br>
                 <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
                 style="color:red"></span><br>
+
                 <label class="my-3">Описание: <textarea th:field="*{description}"></textarea></label><br>
-                <label class="my-3">Дедлайн: <input type="date" th:field="*{deadline}"></label>
+
+                <label class="my-3">Дедлайн: <input type="date" th:field="*{deadline}"></label><br>
                 <span th:if="${#fields.hasErrors('deadline')}" th:errors="*{deadline}"
                 style="color:red"></span><br>
+
                 <label class="my-3">
                     Статус:
                     <select th:field="*{status}">
@@ -28,17 +32,25 @@
                         <option th:value="'Review'">REVIEW</option>
                         <option th:value="'Completed'">COMPLETED</option>
                     </select>
-                </label>
+                </label><br>
                 <span th:if="${#fields.hasErrors('status')}" th:errors="*{status}"
                 style="color:red"></span><br>
+
                 <label class="my-3">Story Points: 
-                    <input type="number" th:field="*{storyPoints}"></label>
+                    <input type="number" th:field="*{storyPoints}"></label><br>
                 <span th:if="${#fields.hasErrors('storyPoints')}" th:errors="*{storyPoints}"
                 style="color:red"></span><br>
+
                 <label class="my-3">Приоритет: 
-                    <input type="number" th:field="*{priority}"></label>
+                    <select th:field="*{priority}">
+                        <option th:value="'High'">HIGH</option>
+                        <option th:value="'Medium'">MEDIUM</option>
+                        <option th:value="'Low'">LOW</option>
+                    </select>
+                </label><br>
                 <span th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"
                 style="color:red"></span><br>
+
                 <label class="my-3 d-block mx-auto">
                     Цель:
                     <select name="goalId" class="form-select">
@@ -48,7 +60,7 @@
                         th:text="${g.name}"
                         th:selected="${task.goal != null and task.goal.id == g.id}"></option>
                     </select>
-                </label>
+                </label><br>
                 <span th:if="${#fields.hasErrors('goal')}" th:errors="*{goal}"
                 style="color:red"></span><br>
                 

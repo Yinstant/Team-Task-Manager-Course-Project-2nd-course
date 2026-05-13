@@ -55,28 +55,39 @@ public class ProjectController {
     @GetMapping({"/", ""})
     public String ListProjects(Model model){
         model.addAttribute("projects", projectService.GetUserProjects());
+        model.addAttribute("isKanban", false);
         return "task-list";
     }
 
-    // Просмотр проекта
+    // Просмотр проекта деревом целей
     @GetMapping("/{id}")
     public String ShowProject(@PathVariable Long id, Model model){
         Project project = projectService.GetProjectIfAccesible(id);
             
         model.addAttribute("currentProject", project);
         model.addAttribute("projects", projectService.GetUserProjects());
-        
-        List<Goal> goals = goalRepository.findByProjectId(id);
-        Map<Goal, List<Task>> tasksByGoal = new LinkedHashMap<>();
 
-        for (Goal goal : goals){
-            tasksByGoal.put(goal, taskRepository.findByGoalId(goal.getId()));
-        }
-
-        model.addAttribute("tasksByGoal", tasksByGoal);
+        model.addAttribute("tasksByGoal", projectService.GetTasksByGoal(id));
         model.addAttribute("tasksWithoutGoal", taskRepository.findByProjectIdAndGoalIsNull(id));
+
+        model.addAttribute("isKanban", false);
         
         return "task-list";
+    }
+
+    // Просмотр проекта канбан-доской
+    @GetMapping("/{id}/kanban")
+    public String ShowProjectKanban(@PathVariable Long id, Model model){
+        Project project = projectService.GetProjectIfAccesible(id);
+            
+        model.addAttribute("currentProject", project);
+        model.addAttribute("projects", projectService.GetUserProjects());
+
+        model.addAttribute("tasksByStatus", projectService.GetTasksByStatus(id));
+        
+        model.addAttribute("isKanban", true);
+
+        return "kanban";
     }
 
     // Показать форму добавления проекта

@@ -4,13 +4,23 @@
         <a href="/projects/new" class="btn btn-sm btn-primary my-3">+ Новый проект</a>
         <ul class="nav flex-column">
             <li th:each="project : ${projects}" class="nav-item d-flex align-items-center justify-content-between my-1 border border-2 rounded-pill">
-                <a class="nav-link d-inline-block me-auto text-truncate" style="max-width: 140px;" th:href="@{/projects/{pid}(pid = ${project.id})}" 
-                    th:text="${project.name}"></a>
+                <a class="nav-link d-inline-block me-auto text-truncate" style="max-width: 140px;" 
+                    th:href="@{/projects/{pid}(pid = ${project.id})}" 
+                    th:text="${project.name}" 
+                    th:if="${!isKanban}"></a>
+                
+                <a class="nav-link d-inline-block me-auto text-truncate" style="max-width: 140px;" 
+                    th:href="@{/projects/{pid}/kanban(pid = ${project.id})}" 
+                    th:text="${project.name}" 
+                    th:if="${isKanban}"></a>
+
                 <div class="flex-shrink-0">
                     <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
                     th:href="@{/projects/{id}/delete(id=${project.id})}">Delete</a>
+
                     <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
                     th:href="@{/projects/{id}/edit(id=${project.id})}">Edit</a>
+
                     <a class="btn btn-sm float-end mx-1 ms-auto"
                     th:href="@{/projects/{id}/invite(id=${project.id})}">
                         <i class="bi-person-plus-fill"></i>

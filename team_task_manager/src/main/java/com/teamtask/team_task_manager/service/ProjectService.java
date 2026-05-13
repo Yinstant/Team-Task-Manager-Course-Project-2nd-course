@@ -1,21 +1,31 @@
 package com.teamtask.team_task_manager.service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.teamtask.team_task_manager.model.Goal;
 import com.teamtask.team_task_manager.model.Project;
+import com.teamtask.team_task_manager.model.Status;
+import com.teamtask.team_task_manager.model.Task;
 import com.teamtask.team_task_manager.model.User;
+import com.teamtask.team_task_manager.repository.GoalRepository;
 import com.teamtask.team_task_manager.repository.ProjectRepository;
+import com.teamtask.team_task_manager.repository.TaskRepository;
 import com.teamtask.team_task_manager.repository.UserRepository;
 
 @Service
 public class ProjectService {
     @Autowired ProjectRepository projectRepository;
     @Autowired UserRepository userRepository;
+    @Autowired GoalRepository goalRepository;
+    @Autowired TaskRepository taskRepository;
 
     public User GetCurrentUser(){
         String username = SecurityContextHolder
@@ -54,5 +64,21 @@ public class ProjectService {
             .getName();
         
         return projectRepository.findAllByMembersUsername(username);
+    }
+
+    public Map<Goal, List<Task>> GetTasksByGoal(Long projectId){
+        List<Goal> goals = goalRepository.findByProjectId(projectId);
+        Map<Goal, List<Task>> tasksByGoal = new LinkedHashMap<>();
+
+        for (Goal goal : goals){
+            tasksByGoal.put(goal, taskRepository.findByGoalId(goal.getId()));
+        }
+
+        return tasksByGoal;
+    }
+
+    public Map<String, List<Task>> GetTasksByStatus(Long projectId){
+        List<Task> tasks = taskRepository.findByProjectId(projectId);
+        return tasks.stream().collect(Collectors.groupingBy(t -> t.getStatus().name()));
     }
 }

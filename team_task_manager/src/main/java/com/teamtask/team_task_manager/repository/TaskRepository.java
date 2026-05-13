@@ -9,4 +9,5 @@ import com.teamtask.team_task_manager.model.Task;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByGoalId(Long goalId);
     List<Task> findByProjectIdAndGoalIsNull(Long projectId);
+    List<Task> findByProjectId(Long projectId);
 }
