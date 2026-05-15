@@ -38,6 +38,7 @@
             </div>
             <div class="offcanvas-body bg-light" th:insert="~{fragments/sidebar :: sidebar}"></div>
         </div>
+
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 d-lg-block d-none bg-light" th:insert="~{fragments/sidebar :: sidebar}"></div>
@@ -50,8 +51,10 @@
                     <h1 class="my-5 text-truncate" th:text="'Список задач проекта: ' + ${currentProject.name}"></h1>
                     
                     <div class="d-flex mx-3 pb-3">
-                        <a class="btn btn-primary mx-3" th:href="@{/tasks/new(projectId=${currentProject.id})}">+ Новая задача</a>
-                        <a class="btn btn-primary mx-3" th:href="@{/goals/new(projectId=${currentProject.id})}">+ Новая цель</a>
+                        <a class="btn btn-primary mx-3" th:href="@{/tasks/new(projectId=${currentProject.id})}"
+                            th:if="${projectService.IsCurrentManager(currentProject.id)}">+ Новая задача</a>
+                        <a class="btn btn-primary mx-3" th:href="@{/goals/new(projectId=${currentProject.id})}"
+                            th:if="${projectService.IsCurrentManager(currentProject.id)}">+ Новая цель</a>
                     </div>
                     
                     <div th:if="${message}" th:text="${message}" style="color:green"></div>
@@ -61,9 +64,11 @@
                             <div class="goal-header" onclick="toggleTasks(this)">
                                 <strong th:text="${entry.key.name}"></strong>
                                 <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                                    th:href="@{/goals/{id}/delete(id=${entry.key.id}, projectId=${currentProject.id})}">Delete</a>
+                                    th:href="@{/goals/{id}/delete(id=${entry.key.id}, projectId=${currentProject.id})}"
+                                    th:if="${projectService.IsCurrentManager(currentProject.id)}">Delete</a>
                                 <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                                    th:href="@{/goals/{id}/edit(id=${entry.key.id}, projectId=${currentProject.id})}">Edit</a>
+                                    th:href="@{/goals/{id}/edit(id=${entry.key.id}, projectId=${currentProject.id})}"
+                                    th:if="${projectService.IsCurrentManager(currentProject.id)}">Edit</a>
                             </div>
                             <div class="task-list">
                                 <ul class="list-group my-2">
@@ -75,9 +80,11 @@
                                             (${task.status.name() == 'Review'} ? 'bg-dark' : 'bg-success'))" 
                                             th:text="${task.status}"></span>
                                         <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                                            th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}">Delete</a>
+                                            th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}"
+                                            th:if="${projectService.IsCurrentManager(currentProject.id)}">Delete</a>
                                         <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                                            th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}">Edit</a>
+                                            th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}"
+                                            th:if="${projectService.IsCurrentManager(currentProject.id)}">Edit</a>
                                     </li>
                                 </ul>
                             </div>
@@ -92,9 +99,11 @@
                                         (${task.status.name() == 'Review'} ? 'bg-dark' : 'bg-success'))" 
                                         th:text="${task.status}"></span>
                                     <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                                        th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}">Delete</a>
+                                        th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}"
+                                        th:if="${projectService.IsCurrentManager(currentProject.id)}">Delete</a>
                                     <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                                        th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}">Edit</a>
+                                        th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}"
+                                        th:if="${projectService.IsCurrentManager(currentProject.id)}">Edit</a>
                                 </li>
                             </ul>
                         </div>

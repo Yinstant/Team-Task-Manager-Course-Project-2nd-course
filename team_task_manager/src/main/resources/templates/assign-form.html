@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Распределение задачи</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .card-detail {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-detail:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+        }
+        .border-left-highlight {
+            border-left-width: 4px;
+        }
+    </style>
+</head>
+<body style="background-color: azure;">
+
+<div class="container py-5">
+    <div class="row justify-content-center g-4">
+        <!-- Карточка с задачей -->
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden card-detail h-100">
+                <div class="card-body p-4">
+                    <!-- Заголовок с цветной полосой -->
+                    <div th:classappend="${task.priority.name() == 'High'} ? 'border-start border-danger border-4' : 
+                                        (${task.priority.name() == 'Medium'} ? 'border-start border-primary border-4' : '')" 
+                         class="ps-3">
+                        <h3 class="card-title fw-bold" th:text="${task.name}">Название задачи</h3>
+                        <div class="d-flex flex-wrap gap-3 mt-2 mb-3">
+                            <span class="badge bg-secondary" th:text="'Проект: ' + ${task.project.name}"></span>
+                            <span class="badge bg-info text-dark" th:if="${task.goal != null}" th:text="'Цель: ' + ${task.goal.name}"></span>
+                            <span class="badge bg-warning text-dark" th:text="'Приоритет: ' + ${task.priority}"></span>
+                            <span class="badge bg-success" th:text="'Story Points: ' + ${task.storyPoints}" th:if="${task.storyPoints != null}"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><i class="bi bi-calendar-event me-2"></i> <strong>Дедлайн:</strong> <span th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"></span></p>
+                            <p><i class="bi bi-clock-history me-2"></i> <strong>Создана:</strong> <span th:text="${#temporals.format(task.creationTime, 'dd.MM.yyyy HH:mm')}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="bi bi-arrow-repeat me-2"></i> <strong>Обновлена:</strong> <span th:text="${#temporals.format(task.updatedTime, 'dd.MM.yyyy HH:mm')}"></span></p>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-3"><i class="bi bi-card-text me-2"></i>Описание:</h5>
+                    <div class="bg-light p-3 rounded-3">
+                        <p class="mb-0" th:text="${task.description}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Форма назначения -->
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h4 class="text-center fw-semibold"><i class="bi bi-person-plus me-2"></i>Назначить исполнителя</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/tasks/{id}/assign(id=${task.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="projectId" th:value="${task.project.id}" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold"><i class="bi bi-people me-1"></i> Ответственный исполнитель</label>
+                            <select name="executorId" class="form-select form-select-lg" required>
+                                <option value="" disabled selected>-- Выберите пользователя --</option>
+                                <option th:each="ex : ${executorList}" th:value="${ex.id}" th:text="${ex.username}"></option>
+                            </select>
+                            <div class="form-text">Только участники с ролью "Исполнитель" могут быть назначены.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg"></i> Распределить
+                            </button>
+                            <a th:href="@{/projects/{pid}/kanban(pid=${task.project.id})}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Назад к канбану
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

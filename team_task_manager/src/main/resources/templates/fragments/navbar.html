@@ -12,6 +12,10 @@
                         '/projects' : '/projects/' + currentProject.id}">Дерево целей</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="${(currentProject == null) ?
                         '/kanban' : '/projects/' + currentProject.id + '/kanban'}">Канбан</a></li>
+                    <li class="nav-item" th:if="${currentProject != null && projectService.IsCurrentExecutor(currentProject.id)}">
+                        <a class="nav-link" th:href="${'/projects/' + currentProject.id + '/my-tasks'}">Личные задачи</a></li>
+                    <li class="nav-item" th:if="${currentProject != null && projectService.IsCurrentTester(currentProject.id)}">
+                        <a class="nav-link" th:href="${'/projects/' + currentProject.id + '/review'}">Оценка задач</a></li>
                 </ul>
             </div>
 

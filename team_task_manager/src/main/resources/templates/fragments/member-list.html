@@ -1,0 +1,19 @@
+<div th:fragment="member-list" th:if="${currentProject != null}" class="my-3">
+    <h3 th:text="'Участники проекта: ' + ${currentProject.name}">Участники проекта</h3>
+    <ul class="nav flex-column">
+        <li th:each="member : ${members}" class="nav-item d-flex align-items-center justify-content-between my-1 border-bottom border-2">
+            <h6 class="nav-link d-inline-block me-auto text-truncate" style="max-width: 140px;" 
+            th:text="${member.username}"></h6>
+
+            <div class="flex-shrink-0">
+                <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
+                    th:href="@{/projects/{id}/exclude(id=${currentProject.id}, username=${member.username})}"
+                    th:if="${projectService.IsCurrentLeader(currentProject.id) || projectService.IsCurrentManager(currentProject.id)}">Delete</a>
+
+                <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
+                    th:href="@{/projects/{id}/editRoles(id=${currentProject.id}, username=${member.username})}"
+                    th:if="${projectService.IsCurrentLeader(currentProject.id)}">Edit</a>
+            </div>
+        </li>
+    </ul>
+</div>

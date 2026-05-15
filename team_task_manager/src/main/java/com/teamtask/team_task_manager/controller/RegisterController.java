@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.teamtask.team_task_manager.model.Role;
 import com.teamtask.team_task_manager.model.User;
-import com.teamtask.team_task_manager.repository.RoleRepository;
 import com.teamtask.team_task_manager.repository.UserRepository;
 
 import jakarta.validation.Valid;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class RegisterController {
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private RoleRepository roleRepository;
 
     @GetMapping({"", "/"})
     public String showRegistrationForm(Model model) {
@@ -40,10 +38,7 @@ public class RegisterController {
             return "register";
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName("ROLE_EXECUTOR")
-            .orElseThrow(() -> new RuntimeException("Role not found"));
-        
-        user.setRoles(Set.of(userRole));
+
         userRepository.save(user);
 
         return "redirect:/login";

@@ -20,9 +20,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/login", "/css/**", "/js/**")
+                .requestMatchers("/register", "/login", "/css/**", "/js/**", "/h2-console/**")
                 .permitAll().anyRequest().authenticated()
             )
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
             .formLogin(login -> login
                 .loginPage("/login")
                 .defaultSuccessUrl("/projects", true)

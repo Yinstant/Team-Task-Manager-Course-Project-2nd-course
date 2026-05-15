@@ -42,6 +42,10 @@ public class GoalController {
             throw new AccessDeniedException("У вас нет доступа к этому проекту");
         }
 
+        if (!projectService.IsCurrentManager(projectId)){
+            throw new AccessDeniedException("Только менеджер проекта может добавлять цель");
+        }
+
         Goal goal = new Goal();
         goal.setProject(projectRepository.getReferenceById(projectId));
     
@@ -58,6 +62,10 @@ public class GoalController {
             RedirectAttributes redirectAttributes) {
         if (!projectService.HasAccess(projectId)){
             throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
+        if (!projectService.IsCurrentManager(projectId)){
+            throw new AccessDeniedException("Только менеджер проекта может добавлять цель");
         }
 
         if (result.hasErrors())
@@ -79,6 +87,10 @@ public class GoalController {
             throw new AccessDeniedException("У вас нет доступа к этому проекту");
         }
         
+        if (!projectService.IsCurrentManager(projectId)){
+            throw new AccessDeniedException("Только менеджер проекта может редактировать цель");
+        }
+
         Goal goal = goalRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Invalid goal id: " + id));
         
@@ -97,6 +109,10 @@ public class GoalController {
             RedirectAttributes redirectAttributes) {
         if (!projectService.HasAccess(projectId)){
             throw new AccessDeniedException("У вас нет доступа к этому проекту");
+        }
+
+        if (!projectService.IsCurrentManager(projectId)){
+            throw new AccessDeniedException("Только менеджер проекта может редактировать цель");
         }
 
         if (result.hasErrors())
@@ -121,6 +137,10 @@ public class GoalController {
             throw new AccessDeniedException("У вас нет доступа к этому проекту");
         }
         
+        if (!projectService.IsCurrentManager(projectId)){
+            throw new AccessDeniedException("Только менеджер проекта может удалять цель");
+        }
+
         goalRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Цель успешно удалена!");
         return "redirect:/projects/" + projectId;

@@ -51,7 +51,8 @@
                     <h1 class="my-5 text-truncate" th:text="'Канбан-доска проекта: ' + ${currentProject.name}"></h1>
                     
                     <div class="d-flex mx-3 pb-3">
-                        <a class="btn btn-primary mx-3" th:href="@{/tasks/new(projectId=${currentProject.id})}">+ Новая задача</a>
+                        <a class="btn btn-primary mx-3" th:href="@{/tasks/new(projectId=${currentProject.id})}"
+                            th:if="${projectService.IsCurrentManager(currentProject.id)}">+ Новая задача</a>
                     </div>
                     
                     <div th:if="${message}" th:text="${message}" style="color:green"></div>
@@ -69,7 +70,8 @@
                                         <small th:text="'Story Points: ' + ${task.storyPoints}" th:if="${task.storyPoints != null}"></small>
                                         <form th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
                                             <input type="hidden" name="oldStatus" value="ToDo">
-                                            <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2"
+                                                th:if="${projectService.IsCurrentManager(currentProject.id)}">
                                                 <i class="bi bi-arrow-right"></i>
                                             </button>
                                         </form>
@@ -82,13 +84,16 @@
                             <div class="card-header bg-secondary text-white">IN PROGRESS</div>
                             <div class="card-body">
                                 <div class="card mb-2" th:each="task : ${tasksByStatus['InProgress']}">
-                                    <div class="card-body">
+                                    <div class="card-body border-start border-4" th:classappend="${task.priority.name() == 'High'} ? 
+                                        'border-danger' : (${task.priority.name() == 'Medium'} ? 
+                                        'border-primary' : '')">
                                         <h5 th:text="${task.name}"></h5>
                                         <small th:text="${task.deadline}"></small>
                                         <small th:text="'Story Points: ' + ${task.storyPoints}" th:if="${task.storyPoints != null}"></small>
                                         <form th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
                                             <input type="hidden" name="oldStatus" value="InProgress">
-                                            <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2"
+                                                th:if="${projectService.IsCurrentExecutor(currentProject.id)}">
                                                 <i class="bi bi-arrow-right"></i>
                                             </button>
                                         </form>
@@ -101,13 +106,16 @@
                             <div class="card-header bg-secondary text-white">Review</div>
                             <div class="card-body">
                                 <div class="card mb-2" th:each="task : ${tasksByStatus['Review']}">
-                                    <div class="card-body">
+                                    <div class="card-body border-start border-4" th:classappend="${task.priority.name() == 'High'} ? 
+                                        'border-danger' : (${task.priority.name() == 'Medium'} ? 
+                                        'border-primary' : '')">
                                         <h5 th:text="${task.name}"></h5>
                                         <small th:text="${task.deadline}"></small>
                                         <small th:text="'Story Points: ' + ${task.storyPoints}" th:if="${task.storyPoints != null}"></small>
                                         <form th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
                                             <input type="hidden" name="oldStatus" value="Review">
-                                            <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2"
+                                                th:if="${projectService.IsCurrentTester(currentProject.id)}">
                                                 <i class="bi bi-arrow-right"></i>
                                             </button>
                                         </form>
@@ -120,13 +128,16 @@
                             <div class="card-header bg-secondary text-white">CHECKING</div>
                             <div class="card-body">
                                 <div class="card mb-2" th:each="task : ${tasksByStatus['Checking']}">
-                                    <div class="card-body">
+                                    <div class="card-body border-start border-4" th:classappend="${task.priority.name() == 'High'} ? 
+                                        'border-danger' : (${task.priority.name() == 'Medium'} ? 
+                                        'border-primary' : '')">
                                         <h5 th:text="${task.name}"></h5>
                                         <small th:text="${task.deadline}"></small>
                                         <small th:text="'Story Points: ' + ${task.storyPoints}" th:if="${task.storyPoints != null}"></small>
                                         <form th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
                                             <input type="hidden" name="oldStatus" value="Checking">
-                                            <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2"
+                                                th:if="${projectService.IsCurrentManager(currentProject.id)}">
                                                 <i class="bi bi-arrow-right"></i>
                                             </button>
                                         </form>
@@ -139,13 +150,16 @@
                             <div class="card-header bg-secondary text-white">COMPLETED</div>
                             <div class="card-body">
                                 <div class="card mb-2" th:each="task : ${tasksByStatus['Completed']}">
-                                    <div class="card-body">
+                                    <div class="card-body border-start border-4" th:classappend="${task.priority.name() == 'High'} ? 
+                                        'border-danger' : (${task.priority.name() == 'Medium'} ? 
+                                        'border-primary' : '')">
                                         <h5 th:text="${task.name}"></h5>
                                         <small th:text="${task.deadline}"></small>
                                         <small th:text="'Story Points: ' + ${task.storyPoints}" th:if="${task.storyPoints != null}"></small>
                                         <form th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
                                             <input type="hidden" name="oldStatus" value="Completed">
-                                            <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2"
+                                                th:if="${projectService.IsCurrentManager(currentProject.id)}">
                                                 <i class="bi bi-arrow-left"></i>
                                             </button>
                                         </form>
