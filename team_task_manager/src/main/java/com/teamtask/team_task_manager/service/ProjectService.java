@@ -52,7 +52,7 @@ public class ProjectService {
         return isContains;
     }
 
-    public Project GetProjectIfAccesible(Long projectId){
+    public Project GetProjectIfAccessible(Long projectId){
         if (!HasAccess(projectId)){
             throw new AccessDeniedException("У вас нет доступа к этому проекту");
         }
@@ -146,5 +146,9 @@ public class ProjectService {
             .collect(Collectors.toList());
         
         return reviewTasks;
+    }
+
+    public List<Membership> GetMembers(Long projectId){
+        return membershipRepository.findAllByProjectId(projectId);
     }
 }

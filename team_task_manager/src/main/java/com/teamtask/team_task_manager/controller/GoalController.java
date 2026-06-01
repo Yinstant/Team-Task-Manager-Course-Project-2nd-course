@@ -1,11 +1,15 @@
 package com.teamtask.team_task_manager.controller;
 
 import com.teamtask.team_task_manager.repository.ProjectRepository;
+import com.teamtask.team_task_manager.repository.TaskRepository;
 import com.teamtask.team_task_manager.service.ProjectService;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.teamtask.team_task_manager.model.Goal;
+import com.teamtask.team_task_manager.model.Task;
 import com.teamtask.team_task_manager.repository.GoalRepository;
 
 import jakarta.validation.Valid;
@@ -26,12 +31,16 @@ import jakarta.validation.Valid;
 public class GoalController {
     private final ProjectRepository projectRepository;
     private final GoalRepository goalRepository;
+    private final TaskRepository taskRepository;
 
     @Autowired ProjectService projectService;
 
-    public GoalController(GoalRepository goalRepository, ProjectRepository projectRepository){
+    public GoalController(GoalRepository goalRepository, ProjectRepository projectRepository,
+        TaskRepository taskRepository
+    ){
         this.goalRepository = goalRepository;
         this.projectRepository = projectRepository;
+        this.taskRepository = taskRepository;
     }
 
     // Показать форму добавления цели
@@ -55,6 +64,7 @@ public class GoalController {
     }
 
     // Сохранение добавленной цели
+    @Transactional
     @PostMapping
     public String AddGoal(@Valid @ModelAttribute Goal goal,
             BindingResult result,
@@ -101,6 +111,7 @@ public class GoalController {
     }
 
     // Обновление цели
+    @Transactional
     @PostMapping("/{id}")
     public String UpdateGoal(@PathVariable Long id,
             @Valid @ModelAttribute Goal goal,
@@ -128,6 +139,7 @@ public class GoalController {
     }            
 
     // Удаление цели
+    @Transactional
     @GetMapping("/{id}/delete")
     public String DeleteGoal(
             @PathVariable Long id,
@@ -140,6 +152,12 @@ public class GoalController {
         if (!projectService.IsCurrentManager(projectId)){
             throw new AccessDeniedException("Только менеджер проекта может удалять цель");
         }
+
+        List<Task> tasks = taskRepository.findByGoalId(id);
+        for (Task task : tasks) {
+            task.setGoal(null);
+        }
+        taskRepository.saveAll(tasks);
 
         goalRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Цель успешно удалена!");

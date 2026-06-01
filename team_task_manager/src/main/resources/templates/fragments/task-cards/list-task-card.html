@@ -1,0 +1,40 @@
+<div th:fragment="list-task-card(task, status, btnText, isActive, isReview)">
+    <div class="card my-3 shadow card-detail">
+        <div class="card-body border-start border-4" th:classappend="${task.priority.name() == 'High'} ? 
+            'border-danger' : (${task.priority.name() == 'Medium'} ? 
+            'border-primary' : '')">
+            <h5 th:text="${task.name}"></h5>
+            <div class="task-meta">
+                <span><i class="bi bi-calendar3 me-1"></i> <span th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"></span></span>
+                <span th:if="${task.storyPoints != null}"><i class="bi bi-star me-1"></i> <span th:text="${task.storyPoints}"></span></span>
+                <button class="btn" data-bs-toggle="modal" 
+                    data-bs-target="#taskModal" th:data-task-id="${task.id}">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+            </div>
+
+            <a class="btn btn-lg btn-outline-danger float-end mx-2 ms-auto" 
+                th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}"
+                th:if="${projectService.IsCurrentManager(currentProject.id)}">
+                <i class="bi bi-trash"></i>
+            </a>
+            <a class="btn btn-lg btn-outline-warning float-end mx-1 ms-auto" 
+                th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}"
+                th:if="${projectService.IsCurrentManager(currentProject.id)}">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+            
+            <button th:if="${isReview}" class="btn btn-primary mt-3" data-bs-toggle="modal" 
+                data-bs-target="#evalModal" th:data-task-id="${task.id}">
+                <i class="bi bi-check"></i> Оценить
+            </button>
+            <form th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
+                <input type="hidden" name="oldStatus" th:value="${status}">
+                <button type="submit" class="btn btn-sm btn-primary mt-2 btn-status"
+                    th:if="${isActive}">
+                    <i class="bi bi-arrow-right" th:text="${btnText}"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

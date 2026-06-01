@@ -31,11 +31,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"evaluations"})
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Task {
     @Id
@@ -49,7 +51,6 @@ public class Task {
     @Lob
     private String description;
 
-    @Future(message = "Дедлайн нельзя назначить в прошлое!")
     private LocalDate deadline;
 
     @NotNull(message = "Статус задачи не может быть пустым!")
@@ -58,6 +59,7 @@ public class Task {
 
     @Min(1)
     @Max(10)
+    @NotNull(message = "Для каждой задачи нужно указать story points!")
     private Integer storyPoints;
 
     @NotNull(message = "Приоритет задачи не может быть пустым!")

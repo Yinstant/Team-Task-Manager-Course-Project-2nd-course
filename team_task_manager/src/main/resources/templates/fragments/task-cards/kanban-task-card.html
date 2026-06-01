@@ -1,0 +1,71 @@
+<div th:fragment="kanban-task-card(task, status, btnText, isActive)">
+    <style>
+        .task-card {
+            transition: transform 0.15s, box-shadow 0.15s;
+            border: none;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            background: white;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+        .task-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+        .task-meta {
+            font-size: 0.7rem;
+            color: #6c757d;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .btn-status {
+            border-radius: 2rem;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+        }
+    </style>
+    <div class="task-card p-2 shadow-sm border-start border-4" th:classappend="${task.priority.name() == 'High'} ? 
+            'border-danger' : (${task.priority.name() == 'Medium'} ? 
+            'border-primary' : '')">
+        <div class="task-title" th:text="${task.name}"></div>
+
+        <div class="task-meta">
+            <span><i class="bi bi-calendar3 me-1"></i> <span th:text="${#temporals.format(task.deadline, 'dd.MM')}"></span></span>
+            <span th:if="${task.storyPoints != null}"><i class="bi bi-star me-1"></i> <span th:text="${task.storyPoints}"></span></span>
+            <button class="btn" data-bs-toggle="modal" 
+                data-bs-target="#taskModal" th:data-task-id="${task.id}">
+                <i class="bi bi-three-dots"></i>
+            </button>
+        </div>
+
+
+        <div class="d-flex justify-content-between" >
+            <div>
+                <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
+                    th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}"
+                    th:if="${projectService.IsCurrentManager(currentProject.id)}">
+                    <i class="bi bi-trash"></i>
+                </a>
+                <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
+                    th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}"
+                    th:if="${projectService.IsCurrentManager(currentProject.id)}">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+            </div>
+
+            <form th:if="${isActive}" th:action="@{/tasks/{id}/status(id=${task.id}, projectId=${currentProject.id})}" method="post">
+                <input type="hidden" name="oldStatus" th:value="${status}">
+                <button type="submit" class="btn btn-sm btn-outline-primary btn-status">
+                    <i class="bi bi-arrow-right-short"></i> 
+                    <p th:text="${btnText}"></p>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

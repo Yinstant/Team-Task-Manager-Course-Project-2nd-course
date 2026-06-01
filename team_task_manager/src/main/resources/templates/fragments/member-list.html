@@ -2,18 +2,92 @@
     <h3 th:text="'Участники проекта: ' + ${currentProject.name}">Участники проекта</h3>
     <ul class="nav flex-column">
         <li th:each="member : ${members}" class="nav-item d-flex align-items-center justify-content-between my-1 border-bottom border-2">
-            <h6 class="nav-link d-inline-block me-auto text-truncate" style="max-width: 140px;" 
-            th:text="${member.username}"></h6>
+            <div class="card col-12 h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-shadow transition-all">
+                <div class="card-body d-flex align-items-center pb-0">
+                    <h6 class="nav-link d-inline-block me-auto text-truncate" style="max-width: 140px;" 
+                    th:text="${member.user.username}"></h6>
 
-            <div class="flex-shrink-0">
-                <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                    th:href="@{/projects/{id}/exclude(id=${currentProject.id}, username=${member.username})}"
-                    th:if="${projectService.IsCurrentLeader(currentProject.id) || projectService.IsCurrentManager(currentProject.id)}">Delete</a>
+                    <div class="flex-shrink-0">
+                        <a th:if="${projectService.IsCurrentLeader(currentProject.id) || projectService.IsCurrentManager(currentProject.id)}"
+                           class="btn btn-sm btn-outline-danger"
+                           th:href="@{/projects/{id}/exclude(id=${currentProject.id}, username=${member.user.username})}">
+                            <i class="bi bi-person-x"></i>
+                        </a>
 
-                <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                    th:href="@{/projects/{id}/editRoles(id=${currentProject.id}, username=${member.username})}"
-                    th:if="${projectService.IsCurrentLeader(currentProject.id)}">Edit</a>
+                        <a th:if="${projectService.IsCurrentLeader(currentProject.id)}"
+                           class="btn btn-sm btn-outline-warning"
+                           th:href="@{/projects/{id}/editRoles(id=${currentProject.id}, username=${member.user.username})}">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex flex-wrap align-items-center justify-content-end gap-1">
+                    <div class="d-flex flex-wrap gap-1">
+                        <span th:each="role : ${member.roles}" class="badge bg-secondary" th:text="${role.name()}"></span>
+                    </div>
+                </div>
             </div>
         </li>
     </ul>
+    <style>
+        .hover-shadow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 1rem 2rem rgba(0,0,0,.1) !important;
+        }
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
 </div>
+
+<!-- <div th:fragment="member-list" th:if="${currentProject != null}" class="my-3">
+    <h3 class="mb-3">👥 Участники проекта: <span th:text="${currentProject.name}" class="fw-bold"></span></h3>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div th:each="member : ${members}" class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-shadow transition-all">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-secondary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-person-fill fs-4 text-secondary"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0" th:text="${member.username}">Имя</h5>
+                            <small class="text-muted">ID: <span th:text="${member.id}"></span></small>
+                        </div>
+                    </div>
+                    
+
+                    <div th:if="${not #lists.isEmpty(member.roles)}" class="mb-3">
+                        <span class="badge bg-primary me-1" th:each="role : ${member.roles}" th:text="${role.name()}"></span>
+                    </div>
+                    <div th:unless="${not #lists.isEmpty(member.roles)}" class="mb-3 text-muted small">
+                        <i class="bi bi-eye-slash"></i> Наблюдатель (без ролей)
+                    </div>
+                    
+
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <a th:if="${projectService.IsCurrentLeader(currentProject.id) || projectService.IsCurrentManager(currentProject.id)}"
+                           class="btn btn-sm btn-outline-danger"
+                           th:href="@{/projects/{id}/exclude(id=${currentProject.id}, username=${member.username})}">
+                            <i class="bi bi-person-x"></i> Исключить
+                        </a>
+                        <a th:if="${projectService.IsCurrentLeader(currentProject.id)}"
+                           class="btn btn-sm btn-outline-warning"
+                           th:href="@{/projects/{id}/editRoles(id=${currentProject.id}, username=${member.username})}">
+                            <i class="bi bi-pencil-square"></i> Роли
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-end small text-muted">
+                    <i class="bi bi-calendar-check"></i> Участник
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div th:if="${#lists.isEmpty(members)}" class="alert alert-info text-center mt-3">
+        <i class="bi bi-info-circle"></i> В проекте пока нет участников.
+    </div>
+</div> -->

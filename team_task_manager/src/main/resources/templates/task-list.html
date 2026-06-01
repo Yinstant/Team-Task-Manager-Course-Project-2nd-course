@@ -9,7 +9,7 @@
         <style>
             .tree .goal-header {
                 cursor: pointer;
-                background-color: #ffeaa6;
+                background-color: #dbdbdb;
                 padding: 8px;
                 margin-top: 8px;
                 margin-bottom: 4px;
@@ -24,6 +24,10 @@
             }
             .light-blue{
                 background-color: rgb(199, 254, 254);
+            }
+            .card-detail:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
             }
         </style>
     </head>
@@ -43,12 +47,19 @@
             <div class="row">
                 <div class="col-lg-3 d-lg-block d-none bg-light" th:insert="~{fragments/sidebar :: sidebar}"></div>
                 
-                <div class="col-md-9" th:if="${currentProject == null}">
-                    <h1>Выберите проект из левого меню</p>
+                <div class="col-lg-9 p-4" th:if="${currentProject == null}">
+                    <div class="text-center py-5">
+                        <i class="bi bi-folder2-open" style="font-size: 4rem; color: #6c757d;"></i>
+                        <h3 class="mt-3 text-muted">Проект не выбран</h3>
+                        <p class="text-secondary">Выберите проект из левого меню или создайте новый</p>
+                    </div>
                 </div>
 
-                <div class="col-md-9" th:if="${currentProject != null}">
-                    <h1 class="my-5 text-truncate" th:text="'Список задач проекта: ' + ${currentProject.name}"></h1>
+                <div class="col-lg-9" th:if="${currentProject != null}">
+                    <div class="d-flex align-items-center gap-3 my-5 px-4">
+                        <h1 class="text-truncate mb-0" th:text="${currentProject.name}"></h1>
+                        <span class="badge bg-secondary align-middle">Дерево целей</span>
+                    </div>
                     
                     <div class="d-flex mx-3 pb-3">
                         <a class="btn btn-primary mx-3" th:href="@{/tasks/new(projectId=${currentProject.id})}"
@@ -61,56 +72,83 @@
                     
                     <div class="tree shadow-sm m-3">
                         <div th:each="entry : ${tasksByGoal}">
-                            <div class="goal-header" onclick="toggleTasks(this)">
-                                <strong th:text="${entry.key.name}"></strong>
-                                <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                                    th:href="@{/goals/{id}/delete(id=${entry.key.id}, projectId=${currentProject.id})}"
-                                    th:if="${projectService.IsCurrentManager(currentProject.id)}">Delete</a>
-                                <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                                    th:href="@{/goals/{id}/edit(id=${entry.key.id}, projectId=${currentProject.id})}"
-                                    th:if="${projectService.IsCurrentManager(currentProject.id)}">Edit</a>
+                            <div class="card my-3 shadow card-detail goal-header" onclick="toggleTasks(this)">
+                                <div class="card-body border-start border-4 d-flex align-center justify-content-between">
+                                    <h3><strong th:text="${entry.key.name}"></strong></h3>
+                                    <div>
+                                        <a class="btn btn-lg btn-danger float-end mx-2 ms-auto" 
+                                            th:href="@{/goals/{id}/delete(id=${entry.key.id}, projectId=${currentProject.id})}"
+                                            th:if="${projectService.IsCurrentManager(currentProject.id)}">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                        <a class="btn btn-lg btn-warning float-end mx-1 ms-auto" 
+                                            th:href="@{/goals/{id}/edit(id=${entry.key.id}, projectId=${currentProject.id})}"
+                                            th:if="${projectService.IsCurrentManager(currentProject.id)}">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                             <div class="task-list">
-                                <ul class="list-group my-2">
-                                    <li class="list-group-item my-2 light-blue shadow-sm" th:each="task : ${entry.value}">
-                                        <strong th:text="${task.name}"></strong>
-                                        <span class="badge" 
-                                            th:classappend="${task.status.name() == 'ToDo'} ? 'bg-secondary' : 
-                                            (${task.status.name() == 'InProgress'} ? 'bg-primary' : 
-                                            (${task.status.name() == 'Review'} ? 'bg-dark' : 'bg-success'))" 
-                                            th:text="${task.status}"></span>
-                                        <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                                            th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}"
-                                            th:if="${projectService.IsCurrentManager(currentProject.id)}">Delete</a>
-                                        <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                                            th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}"
-                                            th:if="${projectService.IsCurrentManager(currentProject.id)}">Edit</a>
-                                    </li>
-                                </ul>
+                                <div class="d-flex flex-column gap-3">
+                                    <div th:each="task : ${entry.value}">
+                                        <div th:if="${task.status.name() == 'ToDo'}" 
+                                            th:insert="~{fragments/task-cards/list-task-card :: 
+                                            list-task-card(task=${task}, status='ToDo', btnText='В работу', 
+                                            isActive=${projectService.IsCurrentManager(currentProject.id)}, isReview=false)}"></div>
+                                        <div th:if="${task.status.name() == 'InProgress'}" 
+                                            th:insert="~{fragments/task-cards/list-task-card :: 
+                                            list-task-card(task=${task}, status='InProgress', btnText='На проверку', 
+                                            isActive=${projectService.IsCurrentExecutor(currentProject.id)}, isReview=false)}"></div>
+                                        <div th:if="${task.status.name() == 'Review'}" 
+                                            th:insert="~{fragments/task-cards/list-task-card :: 
+                                            list-task-card(task=${task}, status='Review', btnText='На рассмотрение', 
+                                            isActive=${projectService.IsCurrentTester(currentProject.id)}, isReview=false)}"></div>
+                                        <div th:if="${task.status.name() == 'Checking'}" 
+                                            th:insert="~{fragments/task-cards/list-task-card :: 
+                                            list-task-card(task=${task}, status='Checking', btnText='Рассмотреть', 
+                                            isActive=${projectService.IsCurrentManager(currentProject.id)}, isReview=false)}"></div>
+                                        <div th:if="${task.status.name() == 'Completed'}" 
+                                            th:insert="~{fragments/task-cards/list-task-card :: 
+                                            list-task-card(task=${task}, status='Completed', btnText='Вернуть', 
+                                            isActive=${projectService.IsCurrentManager(currentProject.id)}, isReview=false)}"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="tasks-list">
-                            <ul class="list-group my-2 mx-1">
-                                <li class="list-group-item my-2 light-blue shadow-sm border" th:each="task : ${tasksWithoutGoal}">
-                                    <strong th:text="${task.name}"></strong>
-                                    <span class="badge" th:classappend="${task.status.name() == 'ToDo'} ? 'bg-secondary' : 
-                                        (${task.status.name() == 'InProgress'} ? 'bg-primary' : 
-                                        (${task.status.name() == 'Review'} ? 'bg-dark' : 'bg-success'))" 
-                                        th:text="${task.status}"></span>
-                                    <a class="btn btn-sm btn-outline-danger float-end mx-2 ms-auto" 
-                                        th:href="@{/tasks/{id}/delete(id=${task.id}, projectId=${currentProject.id})}"
-                                        th:if="${projectService.IsCurrentManager(currentProject.id)}">Delete</a>
-                                    <a class="btn btn-sm btn-outline-warning float-end mx-1 ms-auto" 
-                                        th:href="@{/tasks/{id}/edit(id=${task.id}, projectId=${currentProject.id})}"
-                                        th:if="${projectService.IsCurrentManager(currentProject.id)}">Edit</a>
-                                </li>
-                            </ul>
+                            <div class="d-flex flex-column gap-3">
+                                <div th:each="task : ${tasksWithoutGoal}">
+                                    <div th:if="${task.status.name() == 'ToDo'}" 
+                                        th:insert="~{fragments/task-cards/list-task-card :: 
+                                        list-task-card(task=${task}, status='ToDo', btnText='В работу', 
+                                        isActive=${projectService.IsCurrentManager(currentProject.id)}, isReview=false)}"></div>
+                                    <div th:if="${task.status.name() == 'InProgress'}" 
+                                        th:insert="~{fragments/task-cards/list-task-card :: 
+                                        list-task-card(task=${task}, status='InProgress', btnText='На проверку', 
+                                        isActive=${projectService.IsCurrentExecutor(currentProject.id)}, isReview=false)}"></div>
+                                    <div th:if="${task.status.name() == 'Review'}" 
+                                        th:insert="~{fragments/task-cards/list-task-card :: 
+                                        list-task-card(task=${task}, status='Review', btnText='На рассмотрение', 
+                                        isActive=${projectService.IsCurrentTester(currentProject.id)}, isReview=false)}"></div>
+                                    <div th:if="${task.status.name() == 'Checking'}" 
+                                        th:insert="~{fragments/task-cards/list-task-card :: 
+                                        list-task-card(task=${task}, status='Checking', btnText='Рассмотреть', 
+                                        isActive=${projectService.IsCurrentManager(currentProject.id)}, isReview=false)}"></div>
+                                    <div th:if="${task.status.name() == 'Completed'}" 
+                                        th:insert="~{fragments/task-cards/list-task-card :: 
+                                        list-task-card(task=${task}, status='Completed', btnText='Вернуть', 
+                                        isActive=${projectService.IsCurrentManager(currentProject.id)}, isReview=false)}"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div th:replace="~{fragments/task-modal :: task-modal}"></div>
+        <script src="/js/script.js"></script>
         <script>
             function toggleTasks(element){
                 element.classList.toggle('active');

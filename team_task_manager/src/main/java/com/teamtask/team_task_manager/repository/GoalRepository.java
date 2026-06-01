@@ -8,4 +8,5 @@ import com.teamtask.team_task_manager.model.Goal;
 
 public interface GoalRepository extends JpaRepository<Goal, Long> { 
     List<Goal> findByProjectId(Long projectId);
+    void deleteByProjectId(Long projectId);
 }

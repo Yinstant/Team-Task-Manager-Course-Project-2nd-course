@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,6 +81,7 @@ public class TaskController {
         }
 
         Task task = new Task();
+        task.setStatus(Status.ToDo);
         task.setProject(projectRepository.getReferenceById(projectId));
         if (goalId != null){
             task.setGoal(goalRepository.getReferenceById(goalId));
@@ -93,6 +95,7 @@ public class TaskController {
     }
 
     // Сохранение добавленной задачи
+    @Transactional
     @PostMapping
     public String AddTask(@Valid @ModelAttribute Task task,
             BindingResult result,
@@ -144,6 +147,7 @@ public class TaskController {
     }
 
     // Обновление задачи
+    @Transactional
     @PostMapping("/{id}")
     public String UpdateTask(@PathVariable Long id,
             @Valid @ModelAttribute Task task,
@@ -175,6 +179,7 @@ public class TaskController {
     }            
 
     // Удаление задачи
+    @Transactional
     @GetMapping("/{id}/delete")
     public String DeleteTask(
             @PathVariable Long id,
@@ -194,6 +199,7 @@ public class TaskController {
     }
 
     // Изменение статуса задачи
+    @Transactional
     @PostMapping("/{id}/status")
     public String ChangeStatus(@PathVariable Long id,
         @RequestParam String oldStatus,
@@ -287,6 +293,7 @@ public class TaskController {
     }
 
     // Назначить ответственного по задаче
+    @Transactional
     @PostMapping("{id}/assign")
     public String AssignTask(@PathVariable Long id,
         @RequestParam Long projectId, 
@@ -312,6 +319,7 @@ public class TaskController {
     }
 
     // Добавить задаче оценку
+    @Transactional
     @PostMapping("{id}/review")
     public String AddEvaluation(@PathVariable Long id,
         @RequestParam Long projectId, 
@@ -359,6 +367,7 @@ public class TaskController {
     }
 
     // Принять решение по задаче
+    @Transactional
     @PostMapping("{id}/checking")
     public String CheckTask(@PathVariable Long id,
         @RequestParam Long projectId, 
@@ -384,4 +393,12 @@ public class TaskController {
 
         return "redirect:/projects/" + projectId + "/kanban";
     }
+
+    // Расширенная информация о задаче
+    @GetMapping("/{id}/details")
+    public String getTaskDetails(@PathVariable Long id, Model model) {
+        Task task = taskRepository.findById(id).orElseThrow();
+        model.addAttribute("task", task);
+        return "fragments/task-cards/detailed-task-card :: detailed-task-card";
+}
 }

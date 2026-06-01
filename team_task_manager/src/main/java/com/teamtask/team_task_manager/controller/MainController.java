@@ -18,7 +18,7 @@ public class MainController {
     // Редирект с главной страницы
     @GetMapping({"/", ""})
     public String mainPageRedirect() {
-        return "redirect:/login";
+        return "redirect:/projects";
     }
 
     // Отображение списка проектов на странице канбан-доски
